@@ -48,7 +48,7 @@ function createCard(employees) {
 }
 
 // What is a less clunky way to find the clicked card and match it to the
-// data from the API than the way I do it below?
+// employee dataset than the way I do it below?
 function findCard(event, employees) {
   //finds parent node of click event
   if (event.target.className === "card") {
@@ -58,7 +58,7 @@ function findCard(event, employees) {
   } else if (event.target.parentNode.parentNode.className === "card") {
     parent = event.target.parentNode.parentNode;
   }
-  //uses email to determine index in employeeData array
+  //uses email to determine index in employee array
   let infoCard = parent.lastElementChild;
   let infoCardElements = infoCard.childNodes;
   let email = infoCardElements[3].textContent;
