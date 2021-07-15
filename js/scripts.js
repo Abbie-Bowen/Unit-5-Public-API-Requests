@@ -118,6 +118,7 @@ function formatBirthday(birthdayData) {
   birthday = `${mm}/${dd}/${yyyy}`;
   return birthday;
 }
+
 //close modal using the 'x'
 function hideModal() {
   document.body.removeChild(document.body.lastElementChild);
@@ -153,14 +154,19 @@ function navigate(e, index, employees) {
 function appendSearch() {
   const searchTool = `
   <form action="#" method="get">
-      <input type="search" id="search-input" class="search-input" placeholder="Search...">
-      <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
+      <input type="search" id="search-input" class="search-input" placeholder="Search by name...">
+      <button type="submit" class="search-submit" id="search-submit">
+        <i class="fa fa-search"></i>
+      </button>
   </form>
   `;
   const searchContainer = document.querySelector(".search-container");
   searchContainer.insertAdjacentHTML("beforeend", searchTool);
 
+  //event listeners for when a user types into the searchbox or clicks search icon
   searchContainer.addEventListener("input", searchFilter);
+  const searchIcon = document.querySelector("search-submit");
+  searchIcon.addEventListener("click", searchFilter);
 }
 
 function searchFilter() {
@@ -168,8 +174,9 @@ function searchFilter() {
   const searchStringLower = searchText.value.toLowerCase();
   function filter(employeeData, searchStringLower) {
     return employeeData.filter(
-      (el) => el.name.first.toLowerCase().indexOf(searchStringLower) !== -1
-      // el.name.last.toLowerCase().indexOf(searchStringLower) !== -1
+      (el) =>
+        el.name.first.toLowerCase().indexOf(searchStringLower) !== -1 ||
+        el.name.last.toLowerCase().indexOf(searchStringLower) !== -1
     );
   }
   const filteredEmployees = filter(employeeData, searchStringLower);
