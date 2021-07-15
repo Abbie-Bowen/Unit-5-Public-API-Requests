@@ -165,7 +165,7 @@ function appendSearch() {
 
   //event listeners for when a user types into the searchbox or clicks search icon
   searchContainer.addEventListener("input", searchFilter);
-  const searchIcon = document.querySelector("search-submit");
+  const searchIcon = document.querySelector(".search-submit");
   searchIcon.addEventListener("click", searchFilter);
 }
 
