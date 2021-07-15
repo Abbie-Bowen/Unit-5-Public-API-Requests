@@ -27,7 +27,6 @@ function checkStatus(response) {
 // EMPLOYEE CARD FUNCTIONS
 //-------------------------------
 function createCard(employees) {
-  console.log(employees);
   for (let i = 0; i < employees.length; i++) {
     let person = employees[i];
     let newCard = `<div class="card">
@@ -72,9 +71,10 @@ function findCard(event, employees) {
 // MODAL FUNCTIONS
 //-------------------------------
 function createModal(index, employees) {
-  let current = employees[index];
-  let loc = current.location;
-  let modal = `
+  const current = employees[index];
+  const loc = current.location;
+  const birthday = formatBirthday(current.dob.date);
+  const modal = `
     <div class="modal-container">
       <div class="modal">
           <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
@@ -86,7 +86,7 @@ function createModal(index, employees) {
               <hr>
               <p class="modal-text">${current.phone}</p>
               <p class="modal-text">${loc.street.number} ${loc.street.name}, ${loc.city}, ${loc.state} ${loc.postcode}</p>
-              <p class="modal-text">Birthday: ${current.dob.date}</p>
+              <p class="modal-text">Birthday: ${birthday}</p>
           </div>
       </div>
       <div class="modal-btn-container">
@@ -98,11 +98,11 @@ function createModal(index, employees) {
   document.body.insertAdjacentHTML("beforeend", modal);
 
   //event listener for 'x' button to close modal
-  let closebtn = document.querySelector(".modal-close-btn");
+  const closebtn = document.querySelector(".modal-close-btn");
   closebtn.addEventListener("click", hideModal);
 
   //event listeners for toggle buttons
-  let navigationButtons = document.querySelector(".modal-btn-container");
+  const navigationButtons = document.querySelector(".modal-btn-container");
   navigationButtons.addEventListener("click", function (e) {
     if (e.target.type === "button") {
       navigate(e, index, employees);
@@ -110,6 +110,14 @@ function createModal(index, employees) {
   });
 }
 
+//format birthday as MM/DD/YYYY
+function formatBirthday(birthdayData) {
+  const mm = birthdayData.slice(5, 7);
+  const dd = birthdayData.slice(8, 10);
+  const yyyy = birthdayData.slice(0, 4);
+  birthday = `${mm}/${dd}/${yyyy}`;
+  return birthday;
+}
 //close modal using the 'x'
 function hideModal() {
   document.body.removeChild(document.body.lastElementChild);
@@ -158,8 +166,6 @@ function appendSearch() {
 function searchFilter() {
   const searchText = document.querySelector(".search-input");
   const searchStringLower = searchText.value.toLowerCase();
-  console.log(searchStringLower);
-  console.log(employeeData);
   function filter(employeeData, searchStringLower) {
     return employeeData.filter(
       (el) => el.name.first.toLowerCase().indexOf(searchStringLower) !== -1
