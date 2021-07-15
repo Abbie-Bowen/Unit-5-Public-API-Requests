@@ -11,7 +11,8 @@ fetch("https://randomuser.me/api/?results=12&nat=us")
   .then(function (res) {
     employeeData = res.results;
   })
-  .then(createCard);
+  .then(appendSearch)
+  .finally(() => createCard(employeeData));
 
 function checkStatus(response) {
   if (response.ok) {
@@ -25,9 +26,10 @@ function checkStatus(response) {
 //-------------------------------
 // EMPLOYEE CARD FUNCTIONS
 //-------------------------------
-function createCard() {
-  for (let i = 0; i < employeeData.length; i++) {
-    let person = employeeData[i];
+function createCard(employees) {
+  console.log(employees);
+  for (let i = 0; i < employees.length; i++) {
+    let person = employees[i];
     let newCard = `<div class="card">
         <div class="card-img-container">
             <img class="card-img" src="${person.picture.large}" alt="profile picture">
@@ -42,11 +44,13 @@ function createCard() {
 
     //click event listner for card to bring up modal
     let card = gallery.lastElementChild;
-    card.addEventListener("click", (e) => findCard(e));
+    card.addEventListener("click", (e) => findCard(e, employees));
   }
 }
 
-function findCard(event) {
+// What is a less clunky way to find the clicked card and match it to the
+// data from the API than the way I do it below?
+function findCard(event, employees) {
   //finds parent node of click event
   if (event.target.className === "card") {
     let parent = event.target;
@@ -59,16 +63,16 @@ function findCard(event) {
   let infoCard = parent.lastElementChild;
   let infoCardElements = infoCard.childNodes;
   let email = infoCardElements[3].textContent;
-  let index = employeeData.findIndex((person) => person.email === email);
+  let index = employees.findIndex((person) => person.email === email);
   //passes clicked index to modal
-  createModal(index);
+  createModal(index, employees);
 }
 
 //-------------------------------
 // MODAL FUNCTIONS
 //-------------------------------
-function createModal(index) {
-  let current = employeeData[index];
+function createModal(index, employees) {
+  let current = employees[index];
   let loc = current.location;
   let modal = `
     <div class="modal-container">
@@ -101,7 +105,7 @@ function createModal(index) {
   let navigationButtons = document.querySelector(".modal-btn-container");
   navigationButtons.addEventListener("click", function (e) {
     if (e.target.type === "button") {
-      navigate(e, index);
+      navigate(e, index, employees);
     }
   });
 }
@@ -112,18 +116,18 @@ function hideModal() {
 }
 
 //modal toggle to navigate between employees when modal is open
-function navigate(e, index) {
+function navigate(e, index, employees) {
   hideModal();
   switch (e.target.textContent) {
     case "Prev":
       if (index == 0) {
-        index = employeeData.length - 1;
+        index = employees.length - 1;
       } else {
         index--;
       }
       break;
     case "Next":
-      if (index == employeeData.length - 1) {
+      if (index == employees.length - 1) {
         index = 0;
       } else {
         index++;
@@ -132,8 +136,38 @@ function navigate(e, index) {
     default:
       hideModal();
   }
-  createModal(index);
+  createModal(index, employees);
 }
+
 //-------------------------------
 // SEARCH TOOL FUNCTIONS
 //-------------------------------
+function appendSearch() {
+  const searchTool = `
+  <form action="#" method="get">
+      <input type="search" id="search-input" class="search-input" placeholder="Search...">
+      <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
+  </form>
+  `;
+  const searchContainer = document.querySelector(".search-container");
+  searchContainer.insertAdjacentHTML("beforeend", searchTool);
+
+  searchContainer.addEventListener("input", searchFilter);
+}
+
+function searchFilter() {
+  const searchText = document.querySelector(".search-input");
+  const searchStringLower = searchText.value.toLowerCase();
+  console.log(searchStringLower);
+  console.log(employeeData);
+  function filter(employeeData, searchStringLower) {
+    return employeeData.filter(
+      (el) => el.name.first.toLowerCase().indexOf(searchStringLower) !== -1
+      // el.name.last.toLowerCase().indexOf(searchStringLower) !== -1
+    );
+  }
+  const filteredEmployees = filter(employeeData, searchStringLower);
+
+  gallery.innerHTML = "";
+  createCard(filteredEmployees);
+}
